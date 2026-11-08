@@ -29,6 +29,8 @@
 #include <Carbon/Carbon.h>
 #include <IOKit/hid/IOHIDLib.h>
 
+#include "MGLContext.h"
+
 // NOTE: All of NSGL was deprecated in the 10.14 SDK
 //       This disables the pointless warnings for every symbol we use
 #ifndef GL_SILENCE_DEPRECATION
@@ -105,8 +107,8 @@ typedef VkResult (APIENTRY *PFN_vkCreateMetalSurfaceEXT)(VkInstance,const VkMeta
 #define GLFW_COCOA_MONITOR_STATE        _GLFWmonitorNS ns;
 #define GLFW_COCOA_CURSOR_STATE         _GLFWcursorNS  ns;
 
-#define GLFW_NSGL_CONTEXT_STATE         _GLFWcontextNSGL nsgl;
-#define GLFW_NSGL_LIBRARY_CONTEXT_STATE _GLFWlibraryNSGL nsgl;
+#define GLFW_MGL_CONTEXT_STATE         _GLFWcontextMGL mgl;
+#define GLFW_MGL_LIBRARY_CONTEXT_STATE _GLFWlibraryMGL mgl;
 
 // HIToolbox.framework pointer typedefs
 #define kTISPropertyUnicodeKeyLayoutData _glfw.ns.tis.kPropertyUnicodeKeyLayoutData
@@ -118,21 +120,23 @@ typedef UInt8 (*PFN_LMGetKbdType)(void);
 #define LMGetKbdType _glfw.ns.tis.GetKbdType
 
 
-// NSGL-specific per-context data
+// MooGL per-context data
 //
-typedef struct _GLFWcontextNSGL
+typedef struct _GLFWcontextMGL
 {
-    id                pixelFormat;
-    id                object;
-} _GLFWcontextNSGL;
+    GLMContext          ctx;
+    int                 interval;
+    double              last_swap;
+    id                  object;
+    id                  renderer;
+} _GLFWcontextMGL;
 
-// NSGL-specific global data
+// MooGL global data
 //
-typedef struct _GLFWlibraryNSGL
+typedef struct _GLFWlibraryMGL
 {
-    // dlopen handle for OpenGL.framework (for glfwGetProcAddress)
-    CFBundleRef     framework;
-} _GLFWlibraryNSGL;
+    void *      handle;
+} _GLFWlibraryMGL;
 
 // Cocoa-specific per-window data
 //
@@ -293,10 +297,10 @@ float _glfwTransformYCocoa(float y);
 
 void* _glfwLoadLocalVulkanLoaderCocoa(void);
 
-GLFWbool _glfwInitNSGL(void);
-void _glfwTerminateNSGL(void);
-GLFWbool _glfwCreateContextNSGL(_GLFWwindow* window,
-                                const _GLFWctxconfig* ctxconfig,
-                                const _GLFWfbconfig* fbconfig);
-void _glfwDestroyContextNSGL(_GLFWwindow* window);
+GLFWbool _glfwInitMGL(void);
+void _glfwTerminateMGL(void);
+GLFWbool _glfwCreateContextMGL(_GLFWwindow* window,
+                               const _GLFWctxconfig* ctxconfig,
+                               const _GLFWfbconfig* fbconfig);
+void _glfwDestroyContextMGL(_GLFWwindow* window);
 

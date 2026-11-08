@@ -174,7 +174,7 @@ GLFWAPI const char* glfwGetVersionString(void)
         " Win32 WGL"
 #endif
 #if defined(_GLFW_COCOA)
-        " Cocoa NSGL"
+        " Cocoa MooGL"
 #endif
 #if defined(_GLFW_WAYLAND)
         " Wayland"

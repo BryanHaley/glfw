@@ -412,7 +412,7 @@ static GLFWbool initializeTIS(void)
     for (_GLFWwindow* window = _glfw.windowListHead;  window;  window = window->next)
     {
         if (window->context.client != GLFW_NO_API)
-            [window->context.nsgl.object update];
+            [window->context.mgl.object update];
     }
 
     _glfwPollMonitorsCocoa();
@@ -684,7 +684,7 @@ void _glfwTerminateCocoa(void)
 
     _glfw_free(_glfw.ns.clipboardString);
 
-    _glfwTerminateNSGL();
+    _glfwTerminateMGL();
     _glfwTerminateEGL();
     _glfwTerminateOSMesa();
 

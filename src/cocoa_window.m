@@ -229,7 +229,7 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
 - (void)windowDidResize:(NSNotification *)notification
 {
     if (window->context.source == GLFW_NATIVE_CONTEXT_API)
-        [window->context.nsgl.object update];
+        [window->context.mgl.object update];
 
     if (_glfw.ns.disabledCursorWindow == window)
         _glfwCenterCursorInContentArea(window);
@@ -264,7 +264,7 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
 - (void)windowDidMove:(NSNotification *)notification
 {
     if (window->context.source == GLFW_NATIVE_CONTEXT_API)
-        [window->context.nsgl.object update];
+        [window->context.mgl.object update];
 
     if (_glfw.ns.disabledCursorWindow == window)
         _glfwCenterCursorInContentArea(window);
@@ -386,7 +386,7 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
 - (void)updateLayer
 {
     if (window->context.source == GLFW_NATIVE_CONTEXT_API)
-        [window->context.nsgl.object update];
+        [window->context.mgl.object update];
 
     _glfwInputWindowDamage(window);
 }
@@ -930,9 +930,9 @@ GLFWbool _glfwCreateWindowCocoa(_GLFWwindow* window,
     {
         if (ctxconfig->source == GLFW_NATIVE_CONTEXT_API)
         {
-            if (!_glfwInitNSGL())
+            if (!_glfwInitMGL())
                 return GLFW_FALSE;
-            if (!_glfwCreateContextNSGL(window, ctxconfig, fbconfig))
+            if (!_glfwCreateContextMGL(window, ctxconfig, fbconfig))
                 return GLFW_FALSE;
         }
         else if (ctxconfig->source == GLFW_EGL_CONTEXT_API)

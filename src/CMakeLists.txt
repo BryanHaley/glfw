@@ -33,7 +33,10 @@ if (GLFW_BUILD_COCOA)
     target_compile_definitions(glfw PRIVATE _GLFW_COCOA)
     target_sources(glfw PRIVATE cocoa_platform.h cocoa_joystick.h cocoa_init.m
                                 cocoa_joystick.m cocoa_monitor.m cocoa_window.m
-                                nsgl_context.m)
+                                mgl_context.m)
+
+    set(MOOGL_INCLUDE_DIR "${GLFW_SOURCE_DIR}/../../include" CACHE PATH "MooGL headers")
+    target_include_directories(glfw PRIVATE "${MOOGL_INCLUDE_DIR}")
 endif()
 
 if (GLFW_BUILD_WIN32)
@@ -140,7 +143,7 @@ target_link_libraries(glfw PRIVATE Threads::Threads)
 # Workaround for CMake not knowing about .m files before version 3.16
 if (CMAKE_VERSION VERSION_LESS "3.16" AND APPLE)
     set_source_files_properties(cocoa_init.m cocoa_joystick.m cocoa_monitor.m
-                                cocoa_window.m nsgl_context.m PROPERTIES
+                                cocoa_window.m mgl_context.m PROPERTIES
                                 LANGUAGE C)
 endif()
 
