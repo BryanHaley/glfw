@@ -212,13 +212,6 @@ GLFWbool _glfwCreateContextMGL(_GLFWwindow* window,
         return GLFW_FALSE;
     }
 
-    if (ctxconfig->share)
-    {
-        _glfwInputError(GLFW_VERSION_UNAVAILABLE,
-                        "MGL: contexts can't share objects yet");
-        return GLFW_FALSE;
-    }
-
     // every request up to 4.6 gets 4.6
     if (ctxconfig->major > 4 || (ctxconfig->major == 4 && ctxconfig->minor > 6))
     {
@@ -230,10 +223,11 @@ GLFWbool _glfwCreateContextMGL(_GLFWwindow* window,
 
     const GLFWbool stencil = fbconfig->stencilBits > 0;
 
-    window->context.mgl.ctx = createGLMContext(GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,
-                                               GL_DEPTH_COMPONENT, GL_FLOAT,
-                                               stencil ? GL_STENCIL_INDEX8 : 0,
-                                               stencil ? GL_UNSIGNED_BYTE : 0);
+    window->context.mgl.ctx = createGLMContextShared(GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,
+                                                     GL_DEPTH_COMPONENT, GL_FLOAT,
+                                                     stencil ? GL_STENCIL_INDEX8 : 0,
+                                                     stencil ? GL_UNSIGNED_BYTE : 0,
+                                                     ctxconfig->share ? ctxconfig->share->context.mgl.ctx : NULL);
     assert(window->context.mgl.ctx);
 
     if (ctxconfig->noerror || ctxconfig->debug)
