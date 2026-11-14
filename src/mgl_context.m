@@ -37,6 +37,10 @@
 GLMContext createGLMContext(GLenum format, GLenum type,
                         GLenum depth_format, GLenum depth_type,
                         GLenum stencil_format, GLenum stencil_type);
+GLMContext createGLMContextProfile(GLenum format, GLenum type,
+                                   GLenum depth_format, GLenum depth_type,
+                                   GLenum stencil_format, GLenum stencil_type,
+                                   GLMContext share, GLbitfield profile);
 
 void MGLsetCurrentContext(GLMContext ctx);
 void MGLswapBuffers(GLMContext ctx);
@@ -223,11 +227,17 @@ GLFWbool _glfwCreateContextMGL(_GLFWwindow* window,
 
     const GLFWbool stencil = fbconfig->stencilBits > 0;
 
-    window->context.mgl.ctx = createGLMContextShared(GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,
-                                                     GL_DEPTH_COMPONENT, GL_FLOAT,
-                                                     stencil ? GL_STENCIL_INDEX8 : 0,
-                                                     stencil ? GL_UNSIGNED_BYTE : 0,
-                                                     ctxconfig->share ? ctxconfig->share->context.mgl.ctx : NULL);
+    // a core context only when asked for one; a program that names no
+    // profile, and does not ask for forward compatibility, may use the old calls
+    const GLFWbool compat = ctxconfig->profile == GLFW_OPENGL_COMPAT_PROFILE ||
+                            (ctxconfig->profile != GLFW_OPENGL_CORE_PROFILE && !ctxconfig->forward);
+
+    window->context.mgl.ctx = createGLMContextProfile(GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,
+                                                      GL_DEPTH_COMPONENT, GL_FLOAT,
+                                                      stencil ? GL_STENCIL_INDEX8 : 0,
+                                                      stencil ? GL_UNSIGNED_BYTE : 0,
+                                                      ctxconfig->share ? ctxconfig->share->context.mgl.ctx : NULL,
+                                                      compat ? 0x2 /* compatibility */ : 0x1 /* core */);
     assert(window->context.mgl.ctx);
 
     if (ctxconfig->noerror || ctxconfig->debug)
