@@ -209,15 +209,19 @@ GLFWbool _glfwCreateContextMGL(_GLFWwindow* window,
                                 const _GLFWctxconfig* ctxconfig,
                                 const _GLFWfbconfig* fbconfig)
 {
-    if (ctxconfig->client == GLFW_OPENGL_ES_API)
+    const GLFWbool es = ctxconfig->client == GLFW_OPENGL_ES_API;
+
+    // every ES request from 2.0 to 3.1 gets 3.1
+    if (es && (ctxconfig->major < 2 || ctxconfig->major > 3 || (ctxconfig->major == 3 && ctxconfig->minor > 1)))
     {
-        _glfwInputError(GLFW_API_UNAVAILABLE,
-                        "MGL: OpenGL ES is not available on macOS");
+        _glfwInputError(GLFW_VERSION_UNAVAILABLE,
+                        "MGL: OpenGL ES %i.%i is not available; MGL makes ES 2.0 to 3.1",
+                        ctxconfig->major, ctxconfig->minor);
         return GLFW_FALSE;
     }
 
     // every request up to 4.6 gets 4.6
-    if (ctxconfig->major > 4 || (ctxconfig->major == 4 && ctxconfig->minor > 6))
+    if (!es && (ctxconfig->major > 4 || (ctxconfig->major == 4 && ctxconfig->minor > 6)))
     {
         _glfwInputError(GLFW_VERSION_UNAVAILABLE,
                         "MGL: OpenGL %i.%i is newer than MGL's 4.6",
@@ -237,6 +241,7 @@ GLFWbool _glfwCreateContextMGL(_GLFWwindow* window,
                                                       stencil ? GL_STENCIL_INDEX8 : 0,
                                                       stencil ? GL_UNSIGNED_BYTE : 0,
                                                       ctxconfig->share ? ctxconfig->share->context.mgl.ctx : NULL,
+                                                      es ? 0x4 /* ES */ :
                                                       compat ? 0x2 /* compatibility */ : 0x1 /* core */);
     assert(window->context.mgl.ctx);
 
